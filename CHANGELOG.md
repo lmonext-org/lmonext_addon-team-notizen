@@ -8,6 +8,24 @@ sicherheitsgeprüft - mehrere kritische Lücken gefunden und behoben (siehe
 unten), außerdem war das Addon durch ein Manifest-Problem in der
 ursprünglichen Form gar nicht erreichbar.
 
+## Version 1.1.1 (KRITISCHER Bugfix)
+
+- KRITISCHER Bugfix (im Zuge einer systematischen Pruefung aller
+  Standalone-Addon-Einstiegspunkte gefunden - siehe ewige-tabelle
+  CHANGELOG.md 1.3.2 fuer den Hintergrund; dieses Addon hatte im
+  Gegensatz zu den anderen bereits die korrekte iframe-Dokumentation,
+  aber einen eigenstaendigen Logik-Bug): die Standalone-Erkennung nutzte
+  basename($_SERVER['SCRIPT_NAME']) === 'lmo-teaminfo.php' statt der in
+  allen anderen Standalone-Addons etablierten Methode
+  defined('LMO_ADDON_STANDALONE_CALL'). SCRIPT_NAME bezieht sich aber
+  IMMER auf die vom Webserver urspruenglich aufgerufene Datei - bei
+  einem echten Aufruf ueber addon-run.php also "addon-run.php", NIEMALS
+  "lmo-teaminfo.php" (diese Datei wird ja per require nachgeladen). Die
+  alte Pruefung war dadurch bei JEDEM echten iframe-Aufruf immer false -
+  genau umgekehrt zur Absicht, kein vollstaendiges <!DOCTYPE html>-
+  Dokument wurde ausgegeben, wo eigentlich eins gebraucht wird. Jetzt
+  korrekt auf defined('LMO_ADDON_STANDALONE_CALL') umgestellt.
+
 ## Version 1.1.0 (Vollständige Mehrsprachigkeit)
 
 - Feature (auf Wunsch): die gesamte Funktionalität ist jetzt über Sprachdateien steuerbar statt fest auf Deutsch programmiert zu sein. Betrifft alle vier Dateien: handler_notizen.php 1.1.0 (alle Flash-/Fehlermeldungen), view_notizen.php 1.1.0 (komplette Admin-Oberfläche: Labels, Buttons, Tabellen-Header, Bestätigungsdialoge), lmo-teaminfo.php 1.1.0 (Frontend-Ausgabe inkl. Fallback-Pfad ohne Template) und templates/standard.tpl.php 1.1.0 (Stammdaten-Labels und Abschnittsüberschriften, bisher fest im Template-HTML eingebettet, jetzt als Platzhalter wie <!--LabelGruendung--> analog zu den bereits bestehenden Daten-Platzhaltern).

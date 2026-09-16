@@ -2,7 +2,7 @@
 /**
  * Project: LMOnext
  * Filename: addon/team-notizen/lmo-teaminfo.php
- * Fileversion: 1.1.0
+ * Fileversion: 1.1.1
  *
  * PHP version 8.2
  *
@@ -29,7 +29,19 @@
  */
 declare(strict_types=1);
 
-$tiIsDirectCall = basename($_SERVER['SCRIPT_NAME'] ?? '') === 'lmo-teaminfo.php';
+// BUGFIX (gemeldet, im Zuge der systematischen Prüfung aller Standalone-
+// Addon-Einstiegspunkte gefunden): $_SERVER['SCRIPT_NAME'] bezieht sich
+// IMMER auf die vom Webserver ursprünglich aufgerufene Datei - bei einem
+// echten Aufruf über addon-run.php (siehe Docblock oben) ist das also
+// "addon-run.php", NIEMALS "lmo-teaminfo.php" (diese Datei wird ja per
+// require nachgeladen, nicht direkt vom Webserver ausgeführt). Die alte
+// Prüfung war dadurch bei jedem echten iframe-Aufruf immer false - genau
+// umgekehrt zur Absicht (kein vollständiges <!DOCTYPE html>-Dokument, wo
+// eigentlich eins gebraucht wird). Jetzt dieselbe, bereits in den anderen
+// Standalone-Addons (mini-tabelle, ewige-tabelle, liga-klassen-rekorde,
+// spieltag-viewer, tabellenrechner) etablierte, korrekte Methode: die von
+// addon-run.php VOR dem require gesetzte Konstante.
+$tiIsDirectCall = defined('LMO_ADDON_STANDALONE_CALL');
 
 require_once __DIR__ . '/../../frontend/bootstrap.php';
 
